@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import books, checkouts, inventory, students
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = FastAPI()
 

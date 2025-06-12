@@ -6,31 +6,30 @@ function BarcodeScanner() {
   const [isbn, setIsbn] = useState("");
   const [status, setStatus] = useState(null);
 
-  const handleScan = async () => {
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/inventory/scan`, { barcode });
+const handleScan = async () => {
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/inventory/scan`, { barcode });
+    setStatus(res.data);
 
-      setStatus(res.data);
-
-      if (res.data.status === "not found") {
-        // Prompt for ISBN input
-        const userIsbn = prompt("Book not found. Please enter ISBN:");
-        if (userIsbn) {
-          const attachRes = await axios.post(`${import.meta.env.VITE_API_URL}/inventory/isbn`, {
-            barcode,
-            isbn: userIsbn,
-          });
-          alert(`ISBN attached: ${attachRes.data.title}`);
-        }
-      } else {
-        alert(`Found: ${res.data.title}`);
+    if (res.data.status === "not found") {
+      const userIsbn = prompt("Book not found. Please enter ISBN:");
+      if (userIsbn) {
+        const attachRes = await axios.post(`${import.meta.env.VITE_API_URL}/inventory/isbn`, {
+          barcode,
+          isbn: userIsbn,
+        });
+        alert(`ISBN attached: ${attachRes.data.title}`);
       }
-
-    } catch (err) {
-      console.error("Scan error:", err.response?.data || err.message || err);
-      alert("Scan failed.");
+    } else {
+      alert(`Found: ${res.data.title}`);
     }
-  };
+
+  } catch (err) {
+    console.error("Scan error:", err.response?.data || err.message || err);
+    alert(err.response?.data?.detail || "Scan failed. Please try again.");
+  }
+};
+
 
   return (
     <div>

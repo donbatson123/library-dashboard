@@ -1,35 +1,27 @@
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 from db import get_db
-import requests
-from utils.google_books import fetch_book_data
 import logging
+from sqlalchemy import text
 
-from pydantic import BaseModel
+router = APIRouter()
+logger = logging.getLogger(__name__)
 
 class BarcodeRequest(BaseModel):
     barcode: str
 
-logger = logging.getLogger(__name__)
-router = APIRouter()
+@router.post("/scan")
+def scan_barcode(payload: BarcodeRequest, db: Session = Depends(get_db)):
+    barcode = payload.barcode
 
-@router.post("/scan")
-@router.post("/scan")
-def scan_barcode(data: BarcodeRequest, db: Session = Depends(get_db)):
-    barcode = data.barcode
-    # Check if barcode exists in books
     result = db.execute(
-        text("SELECT refid, title, author, subject FROM books WHERE barcode = :barcode"),
+        text("SELECT title, author, subject FROM books WHERE barcode = :barcode"),
         {"barcode": barcode}
     )
     book = result.fetchone()
 
-    # Log the scan
-    db.execute(
-        text("INSERT INTO scanned_inventory (barcode) VALUES (:barcode) ON CONFLICT DO NOTHING"),
-        {"barcode": barcode}
-    )
+    db.execute(text("INSERT INTO scanned_inventory (barcode) VALUES (:barcode) ON CONFLICT DO NOTHING"), {"barcode": barcode})
 
     if book:
         db.execute(

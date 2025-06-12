@@ -2,12 +2,14 @@
 services:
   backend:
     build: ./backend
+    env_file:
+      - ./backend/.env
     ports:
       - "8001:8000"
     volumes:
       - ./backend:/app
-    depends_on:
-      - db
+    #depends_on:
+     # - db
 
   frontend:
     build: ./frontend
@@ -20,16 +22,16 @@ services:
     tty: true
 
 
-  db:
-    image: postgres:17
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: library
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./backend/init:/docker-entrypoint-initdb.d
+  #db:
+   # image: postgres:17
+    #restart: always
+    #environment:
+     # POSTGRES_USER: postgres
+      #POSTGRES_PASSWORD: postgres
+      #POSTGRES_DB: library
+    #volumes:
+     # - pgdata:/var/lib/postgresql/data
+      #- ./backend/init:/docker-entrypoint-initdb.d
 
 volumes:
   pgdata:
