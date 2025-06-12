@@ -17,4 +17,3 @@ app.include_router(books.router, prefix="/api/books")
 app.include_router(checkouts.router, prefix="/api/checkouts")
 app.include_router(inventory.router, prefix="/api/inventory")
 app.include_router(students.router, prefix="/api/students")
-
